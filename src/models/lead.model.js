@@ -4,13 +4,12 @@ const leadSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Name is required'],
-      trim: true
+      required: [true, 'Name is required']
     },
     email: {
       type: String,
       required: [true, 'Email is required'],
-      match: [/^\S+@\S+\.\S+$/, 'Invalid email format']
+      match: [/^\S+@\S+\.\S+$/, 'Invalid email']
     },
     phone: String,
     status: {
@@ -27,5 +26,9 @@ const leadSchema = new mongoose.Schema(
     }
   }
 );
+
+// 🔥 INDEXING
+leadSchema.index({ status: 1 });
+leadSchema.index({ name: 'text', email: 'text' });
 
 module.exports = mongoose.model('Lead', leadSchema);

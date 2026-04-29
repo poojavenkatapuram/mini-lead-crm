@@ -1,44 +1,82 @@
-# Mini Lead CRM (Superleap Backend Assessment)
+#  Mini Lead CRM Backend
 
-## Tech Stack
-- Node.js + Express: REST API framework
-- MongoDB + Mongoose: NoSQL database for flexible lead storage
+A scalable backend API to manage leads using **Node.js, Express, and MongoDB**, with support for workflows, filtering, and performance optimization.
 
-## Setup Instructions
-1. Clone the repository
-2. Install dependencies:
-   npm install
-3. Start MongoDB:
-   mongod --dbpath ~/mongodb-data --port 27018 --nounixsocket
-4. Run the server:
-   npm run dev
+---
 
-## API Endpoints
+##  Features
 
-POST /api/leads  
-GET /api/leads  
-GET /api/leads/:id  
-PUT /api/leads/:id  
-DELETE /api/leads/:id  
-PATCH /api/leads/:id/status  
+### Level 1
 
-Supports filtering:
-GET /api/leads?status=NEW
+* CRUD operations for leads
+* Status workflow:
+  NEW → CONTACTED → QUALIFIED → CONVERTED (with LOST)
+* Validation & error handling
 
-## Status Transition Rules
+---
 
-NEW → CONTACTED → QUALIFIED → CONVERTED  
-Any state → LOST (except CONVERTED)  
-CONVERTED and LOST are terminal states  
+### Level 2
 
-Invalid transitions return 400 errors.
+* Pagination (page, limit)
+* Search (name/email, case-insensitive)
+* Filter by status
+* Bulk create & bulk delete
 
-## Design Decisions
-- Used service layer for business logic separation
-- Implemented status transitions using a controlled state machine
-- Centralized validation and error handling
+---
 
-## Future Improvements
-- Bulk operations (Level 2)
-- Caching layer (Level 3)
-- Pagination and search
+### Level 3
+
+* Redis caching (optional)
+* MongoDB indexing
+* Rate limiting
+
+---
+
+## 🛠️Tech Stack
+
+* Node.js
+* Express.js
+* MongoDB (Mongoose)
+* Redis (optional)
+
+---
+
+## ⚙️Setup
+
+git clone https://github.com/poojavenkatapuram/mini-lead-crm.git
+cd mini-lead-crm
+npm install
+npm run dev
+
+---
+
+##  Example API
+
+GET /api/leads?page=1&limit=10&search=pooja
+POST /api/leads
+PATCH /api/leads/:id/status
+POST /api/leads/bulk
+DELETE /api/leads/bulk
+
+---
+
+##  Key Highlights
+
+* Clean architecture (controller + service pattern)
+* Strict status transition logic
+* Scalable querying (pagination + filtering)
+* Performance improvements using caching & indexing
+
+---
+
+## ⚠️Notes
+
+* Redis is optional. If not running, the app works without caching
+* .env file is not included for security
+
+---
+
+## Author
+
+Pooja Venkatapuram
+
