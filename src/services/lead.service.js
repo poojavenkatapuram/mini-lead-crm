@@ -1,7 +1,6 @@
 const Lead = require('../models/lead.model');
 const { client } = require('../config/redis');
 
-// STATUS RULES
 const transitions = {
   NEW: ['CONTACTED', 'LOST'],
   CONTACTED: ['QUALIFIED', 'LOST'],
@@ -14,36 +13,37 @@ const validateTransition = (current, next) => {
   if (['CONVERTED', 'LOST'].includes(current)) {
     throw new Error(`Cannot transition from ${current}`);
   }
-
   if (!transitions[current].includes(next)) {
-    throw new Error(`Invalid status transition from ${current} to ${next}`);
+    throw new Error(`Invalid status transition`);
   }
 };
 
-// CLEAR CACHE
 const clearCache = async () => {
-  await client.flushAll();
+  try {
+    if (client.isOpen) await client.flushAll();
+  } catch {}
 };
 
 // CREATE
 exports.createLead = async (data) => {
-  if (!data.name) throw new Error('Name is required');
-  if (!data.email) throw new Error('Email is required');
-
   const lead = await Lead.create(data);
   await clearCache();
   return lead;
 };
 
-// GET (CACHE)
+// GET (with caching)
 exports.getLeads = async (query) => {
   const key = `leads:${JSON.stringify(query)}`;
 
-  const cached = await client.get(key);
-  if (cached) {
-    console.log('⚡ Cache hit');
-    return JSON.parse(cached);
-  }
+  try {
+    if (client.isOpen) {
+      const cached = await client.get(key);
+      if (cached) {
+        console.log('⚡ Cache hit');
+        return JSON.parse(cached);
+      }
+    }
+  } catch {}
 
   console.log('🐢 Cache miss');
 
@@ -70,12 +70,17 @@ exports.getLeads = async (query) => {
 
   const result = {
     total,
-    page: parseInt(page),
+    page: Number(page),
     pages: Math.ceil(total / limit),
     data: leads
   };
 
-  await client.setEx(key, 60, JSON.stringify(result));
+  try {
+    if (client.isOpen) {
+      await client.setEx(key, 60, JSON.stringify(result));
+    }
+  } catch {}
+
   return result;
 };
 
@@ -97,27 +102,23 @@ exports.deleteLead = async (id) => {
   await clearCache();
 };
 
-// STATUS UPDATE
-exports.updateStatus = async (id, newStatus) => {
+// STATUS
+exports.updateStatus = async (id, status) => {
   const lead = await Lead.findById(id);
   if (!lead) throw new Error('Lead not found');
 
-  validateTransition(lead.status, newStatus);
+  validateTransition(lead.status, status);
 
-  lead.status = newStatus;
+  lead.status = status;
   await clearCache();
   return await lead.save();
 };
 
 // BULK CREATE
 exports.bulkCreateLeads = async (data) => {
-  if (!Array.isArray(data)) {
-    throw new Error('Input must be an array');
-  }
-
-  const result = await Lead.insertMany(data);
+  const leads = await Lead.insertMany(data);
   await clearCache();
-  return result;
+  return leads;
 };
 
 // BULK DELETE

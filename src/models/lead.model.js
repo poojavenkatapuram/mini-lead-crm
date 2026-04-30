@@ -1,34 +1,20 @@
 const mongoose = require('mongoose');
 
-const leadSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Name is required']
-    },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      match: [/^\S+@\S+\.\S+$/, 'Invalid email']
-    },
-    phone: String,
-    status: {
-      type: String,
-      enum: ['NEW', 'CONTACTED', 'QUALIFIED', 'CONVERTED', 'LOST'],
-      default: 'NEW'
-    },
-    source: String
+const leadSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: String,
+  source: String,
+  status: {
+    type: String,
+    enum: ['NEW', 'CONTACTED', 'QUALIFIED', 'CONVERTED', 'LOST'],
+    default: 'NEW'
   },
-  {
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at'
-    }
-  }
-);
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now }
+});
 
-// 🔥 INDEXING
-leadSchema.index({ status: 1 });
+leadSchema.index({ email: 1 });
 leadSchema.index({ name: 'text', email: 'text' });
 
 module.exports = mongoose.model('Lead', leadSchema);
