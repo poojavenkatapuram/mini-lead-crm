@@ -32,7 +32,7 @@ A scalable backend API to manage leads using **Node.js, Express, and MongoDB**, 
 
 ---
 
-## 🛠️Tech Stack
+## Tech Stack
 
 * Node.js
 * Express.js
@@ -41,7 +41,7 @@ A scalable backend API to manage leads using **Node.js, Express, and MongoDB**, 
 
 ---
 
-## ⚙️Setup
+## Setup
 
 git clone https://github.com/poojavenkatapuram/mini-lead-crm.git
 cd mini-lead-crm
@@ -69,7 +69,7 @@ DELETE /api/leads/bulk
 
 ---
 
-## ⚠️Notes
+## Notes
 
 * Redis is optional. If not running, the app works without caching
 * .env file is not included for security
